@@ -1,0 +1,11 @@
+id_tarea,peso,descripcion
+0,15,Autenticacion de Usuario
+1,30,Procesamiento de Imagen
+2,45,Consulta Reporte Anual
+3,10,Envio Email Notificacion
+4,20,Validacion de Token
+5,50,Renderizado de Video Short
+6,25,Actualizacion Base Datos
+7,35,Compresion de Archivos Log
+8,15,Verificacion de Pago
+9,40,Sincronizacion de Backup

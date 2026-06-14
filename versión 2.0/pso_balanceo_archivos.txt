@@ -1,0 +1,164 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import csv
+import json
+import os
+
+class Particula:
+    def __init__(self, dimensiones, min_val, max_val):
+        self.posicion = np.random.uniform(min_val, max_val, size=dimensiones)
+        self.velocidad = np.random.uniform(-1, 1, size=dimensiones)
+        self.mejor_posicion_individual = np.copy(self.posicion)
+        self.mejor_score_individual = float('inf')
+
+class OptimizadoPSO:
+    def __init__(self, funcion_aptitud, dimensiones, num_particulas, max_iter, min_val, max_val):
+        self.funcion_aptitud = funcion_aptitud
+        self.dimensiones = dimensiones
+        self.num_particulas = num_particulas
+        self.max_iter = max_iter
+        self.min_val = min_val
+        self.max_val = max_val
+        self.w = 0.7   
+        self.c1 = 1.5  
+        self.c2 = 1.5  
+        
+        self.enjambre = [Particula(dimensiones, min_val, max_val) for _ in range(num_particulas)]
+        self.mejor_posicion_global = np.zeros(dimensiones)
+        self.mejor_score_global = float('inf')
+        self.historial_scores = []
+
+    def ejecutar(self):
+        for iteracion in range(self.max_iter):
+            for particula in self.enjambre:
+                score_actual = self.funcion_aptitud(particula.posicion)
+                
+                if score_actual < particula.mejor_score_individual:
+                    particula.mejor_score_individual = score_actual
+                    particula.mejor_posicion_individual = np.copy(particula.posicion)
+                
+                if score_actual < self.mejor_score_global:
+                    self.mejor_score_global = score_actual
+                    self.mejor_posicion_global = np.copy(particula.posicion)
+            
+            for particula in self.enjambre:
+                r1 = np.random.rand(self.dimensiones)
+                r2 = np.random.rand(self.dimensiones)
+                
+                cognitivo = self.c1 * r1 * (particula.mejor_posicion_individual - particula.posicion)
+                social = self.c2 * r2 * (self.mejor_posicion_global - particula.posicion)
+                
+                particula.velocidad = (self.w * particula.velocidad) + cognitivo + social
+                particula.posicion = particula.posicion + particula.velocidad
+                particula.posicion = np.clip(particula.posicion, self.min_val, self.max_val)
+                
+            self.historial_scores.append(self.mejor_score_global)
+            print(f"Iteración {iteracion + 1}/{self.max_iter} -> Makespan: {self.mejor_score_global:.2f} ms")
+            
+        return self.mejor_posicion_global, self.mejor_score_global, self.historial_scores
+
+def crear_csv_ejemplo(filename="tareas_input.csv"):
+    if not os.path.exists(filename):
+        tareas_ejemplo = [
+            {"id_tarea": 0, "peso": 15, "descripcion": "Autenticacion de Usuario"},
+            {"id_tarea": 1, "peso": 30, "descripcion": "Procesamiento de Imagen"},
+            {"id_tarea": 2, "peso": 45, "descripcion": "Consulta Reporte Anual"},
+            {"id_tarea": 3, "peso": 10, "descripcion": "Envio Email Notificacion"},
+            {"id_tarea": 4, "peso": 20, "descripcion": "Validacion de Token"},
+            {"id_tarea": 5, "peso": 50, "descripcion": "Renderizado de Video Short"},
+            {"id_tarea": 6, "peso": 25, "descripcion": "Actualizacion Base Datos"},
+            {"id_tarea": 7, "peso": 35, "descripcion": "Compresion de Archivos Log"},
+            {"id_tarea": 8, "peso": 15, "descripcion": "Verificacion de Pago"},
+            {"id_tarea": 9, "peso": 40, "descripcion": "Sincronizacion de Backup"}
+        ]
+        with open(filename, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=["id_tarea", "peso", "descripcion"])
+            writer.writeheader()
+            writer.writerows(tareas_ejemplo)
+
+def cargar_tareas_desde_csv(filename="tareas_input.csv"):
+    pesos = []
+    descripciones = []
+    with open(filename, mode='r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            pesos.append(float(row["peso"]))
+            descripciones.append(row["descripcion"])
+    return np.array(pesos), descripciones
+
+def guardar_resultados_json(filename="resultados_optimizacion.json", asignaciones=None, tiempo_final=None, pesos_tareas=None):
+    resultado = {
+        "metrica_global": {
+            "makespan_optimo_ms": round(tiempo_final, 2),
+            "total_tareas_procesadas": len(asignaciones)
+        },
+        "asignaciones_detalladas": []
+    }
+    
+    for tarea_id, servidor_id in enumerate(asignaciones):
+        resultado["asignaciones_detalladas"].append({
+            "id_tarea": tarea_id,
+            "peso_tarea": float(pesos_tareas[tarea_id]),
+            "servidor_asignado": int(servidor_id)
+        })
+        
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(resultado, f, indent=4, ensure_ascii=False)
+
+NUM_SERVIDORES = 3
+CAPACIDAD_SERVIDORES = np.array([1.0, 1.5, 2.0])
+
+PESO_TAREAS = np.array([])
+DESCRIPCION_TAREAS = []
+
+def evaluar_balanceo_carga(posicion_continua):
+    asignaciones = np.clip(np.round(posicion_continua), 0, NUM_SERVIDORES - 1).astype(int)
+    tiempo_servidores = np.zeros(NUM_SERVIDORES)
+    for tarea_id, servidor_id in enumerate(asignaciones):
+        tiempo_servidores[servidor_id] += PESO_TAREAS[tarea_id] * CAPACIDAD_SERVIDORES[servidor_id]
+    return np.max(tiempo_servidores)
+
+if __name__ == "__main__":
+    crear_csv_ejemplo("tareas_input.csv")
+    PESO_TAREAS, DESCRIPCION_TAREAS = cargar_tareas_desde_csv("tareas_bigData.csv")############aqui cambiamos el archivo que va a leer
+    
+    num_tareas_cargadas = len(PESO_TAREAS)
+    
+    limite_inferior = 0
+    limite_superior = NUM_SERVIDORES - 1
+    
+    pso = OptimizadoPSO(
+        funcion_aptitud=evaluar_balanceo_carga,
+        dimensiones=num_tareas_cargadas,
+        num_particulas=25,
+        max_iter=30,
+        min_val=limite_inferior,
+        max_val=limite_superior
+    )
+    
+    mejor_configuracion, mejor_tiempo, historial = pso.ejecutar()
+    servidores_finales = np.clip(np.round(mejor_configuracion), 0, NUM_SERVIDORES - 1).astype(int)
+    
+    guardar_resultados_json("resultados_optimizacion.json", servidores_finales, mejor_tiempo, PESO_TAREAS)
+    
+    # 5. Desplegar la curva de aprendizaje y convergencia
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(historial) + 1), historial, marker='s', linestyle='-', color='#1f77b4', linewidth=2)
+    
+    plt.title('PSO Cloud Scheduling - Convergencia Basada en Datos de Entrada', fontsize=12, fontweight='bold')
+    plt.xlabel('Iteración del Algoritmo')
+    plt.ylabel('Makespan Mínimo (ms)')
+    plt.grid(True, linestyle='--', alpha=0.5)
+    
+    # SOLUCIÓN: Usar 'offset points' asegura que el texto de la flecha 
+    # siempre se dibuje a 30 píxeles por encima del punto, sin importar los datos.
+    plt.annotate(f'Resultado Guardado: {mejor_tiempo:.2f} ms', 
+                 xy=(len(historial), historial[-1]), 
+                 xytext=(-100, 30), textcoords='offset points',
+                 arrowprops=dict(facecolor='red', shrink=0.08, width=1, headwidth=6))
+                 
+    # Ajuste manual de márgenes en lugar de tight_layout()
+    plt.subplots_adjust(bottom=0.15, top=0.85, left=0.1, right=0.95)
+    
+    print("[INFO] Cerrar la gráfica para finalizar el script.")
+    plt.show()

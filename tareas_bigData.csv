@@ -1,0 +1,11 @@
+id_tarea,peso,descripcion
+0,120,Entrenar Modelo Random Forest
+1,85,Limpieza de Datos Tabulares
+2,200,Inferencia de Red Neuronal Profunda
+3,40,Extraer Features de Texto (NLP)
+4,150,Generar Matriz de Confusion Analitica
+5,90,Descargar Dataset desde AWS S3
+6,300,Optimizacion de Hiperparametros
+7,60,Exportar Pesos del Modelo (H5)
+8,110,Validacion Cruzada (K-Fold)
+9,75,Reduccion de Dimensionalidad (PCA)

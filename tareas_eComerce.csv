@@ -1,0 +1,13 @@
+id_tarea,peso,descripcion
+0,10,Login de Usuario
+1,45,Procesar Pago con Tarjeta
+2,20,Buscar Inventario Base de Datos
+3,15,Actualizar Carrito de Compras
+4,35,Enviar Confirmacion Email
+5,60,Generar Factura PDF
+6,25,Recomendar Productos Relacionados
+7,10,Cargar Imagen de Perfil
+8,50,Aplicar Descuento de Cupon
+9,30,Validar Direccion de Envio
+10,15,Consultar Historial de Compras
+11,40,Notificar a Bodega de Despacho

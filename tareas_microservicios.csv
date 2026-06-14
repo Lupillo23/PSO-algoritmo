@@ -1,0 +1,16 @@
+id_tarea,peso,descripcion
+0,5,Leer Temperatura Sala Servidores
+1,8,Parsear JSON de Humedad Relativa
+2,12,Insertar en Base de Datos TimeSeries
+3,3,Ping de Estado Nodo Central
+4,15,Calcular Promedio Movil 1H
+5,6,Leer Presion Valvula de Gas
+6,10,Validar Umbral de Alerta
+7,4,ACK de Recepcion de Paquete
+8,20,Cifrar Paquete MQTT (TLS)
+9,5,Heartbeat Sensor de Movimiento
+10,8,Sincronizar Reloj Interno NTP
+11,14,Comprimir Log de Eventos Diarios
+12,7,Leer Nivel de Bateria Remota
+13,9,Actualizar Cache del Dashboard UI
+14,11,Transmitir Metricas via UDP

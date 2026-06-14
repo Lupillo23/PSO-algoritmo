@@ -1,0 +1,58 @@
+{
+    "metrica_global": {
+        "makespan_optimo_ms": 585.0,
+        "total_tareas_procesadas": 10
+    },
+    "asignaciones_detalladas": [
+        {
+            "id_tarea": 0,
+            "peso_tarea": 120.0,
+            "servidor_asignado": 2
+        },
+        {
+            "id_tarea": 1,
+            "peso_tarea": 85.0,
+            "servidor_asignado": 0
+        },
+        {
+            "id_tarea": 2,
+            "peso_tarea": 200.0,
+            "servidor_asignado": 0
+        },
+        {
+            "id_tarea": 3,
+            "peso_tarea": 40.0,
+            "servidor_asignado": 1
+        },
+        {
+            "id_tarea": 4,
+            "peso_tarea": 150.0,
+            "servidor_asignado": 1
+        },
+        {
+            "id_tarea": 5,
+            "peso_tarea": 90.0,
+            "servidor_asignado": 1
+        },
+        {
+            "id_tarea": 6,
+            "peso_tarea": 300.0,
+            "servidor_asignado": 0
+        },
+        {
+            "id_tarea": 7,
+            "peso_tarea": 60.0,
+            "servidor_asignado": 2
+        },
+        {
+            "id_tarea": 8,
+            "peso_tarea": 110.0,
+            "servidor_asignado": 1
+        },
+        {
+            "id_tarea": 9,
+            "peso_tarea": 75.0,
+            "servidor_asignado": 2
+        }
+    ]
+}
